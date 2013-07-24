@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO.Packaging;
 using System.Linq;
 using System.Text;
 using System.IO;
@@ -26,6 +27,12 @@ namespace AppLimit.NetSparkle
             {
                 // build the command line 
                 installerCMD = tempName;
+            }
+            else if (tempName.ToLower().EndsWith(".msi.zip"))
+            {
+                string unpacked = UnpackZip(tempName).First();
+                Install(sparkle, unpacked);
+                return;
             }
             else if (Path.GetExtension(tempName).ToLower() == ".zip")
             {
@@ -79,6 +86,32 @@ namespace AppLimit.NetSparkle
 
             // quit the app
             Environment.Exit(0);
+        }
+
+        private static List<string> UnpackZip(string tempName)
+        {
+            string path = Path.GetDirectoryName(tempName);
+            var package = ZipPackage.Open(tempName, FileMode.Open, FileAccess.Read);
+
+            List<string> unpackedFiles = new List<string>();
+
+            foreach (var part in package.GetParts())
+            {
+                var subPath = part.Uri.OriginalString.Replace('/', Path.DirectorySeparatorChar).TrimStart(Path.DirectorySeparatorChar);
+                var target = Path.Combine(path, subPath);
+                if (!Directory.Exists(Path.GetDirectoryName(target)))
+                    Directory.CreateDirectory(Path.GetDirectoryName(target));
+                using (FileStream fs = File.Create(target))
+                {
+                    part.GetStream().CopyTo(fs);
+                }
+
+                unpackedFiles.Add(target);
+            }
+
+            package.Close();
+
+            return unpackedFiles;
         }
 
         public static bool CheckDSA(Sparkle sparkle, NetSparkleAppCastItem item, String tempName)

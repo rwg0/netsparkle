@@ -82,6 +82,7 @@ namespace AppLimit.NetSparkle
 
             if (!NetSparkleCheckAndInstall.CheckDSA(_sparkle, _item, _tempName))
             {
+                btnInstallAndReLaunch.Enabled = false;
                 Size = new Size(Size.Width, 137);
                 lblSecurityHint.Visible = true;
                 BackColor = Color.Tomato;

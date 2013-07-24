@@ -70,6 +70,7 @@
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\AssemblyInfo.cs">
@@ -137,6 +138,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="NetSparkleDownloadProgress.resx">
       <DependentUpon>NetSparkleDownloadProgress.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="NetSparkleDownloadProgress.ru.resx">
       <DependentUpon>NetSparkleDownloadProgress.cs</DependentUpon>
