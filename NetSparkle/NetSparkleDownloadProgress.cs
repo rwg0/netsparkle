@@ -54,13 +54,13 @@ namespace AppLimit.NetSparkle
             String fileName = segments[segments.Length - 1];
 
             // get temp path
-            _tempName = Environment.ExpandEnvironmentVariables("%temp%\\" + fileName);
+            _tempName = Path.GetTempFileName();
 
             // start async download
             WebClient Client = new WebClient();
             Client.DownloadProgressChanged += new DownloadProgressChangedEventHandler(Client_DownloadProgressChanged);
             Client.DownloadFileCompleted += new AsyncCompletedEventHandler(Client_DownloadFileCompleted);
-
+            
             Uri url = new Uri(item.DownloadLink);
 
             Client.DownloadFileAsync(url, _tempName);
@@ -68,6 +68,12 @@ namespace AppLimit.NetSparkle
 
         private void Client_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
         {
+            WebClient wc = (WebClient) sender;
+
+            var contentDisp = wc.ResponseHeaders["content-disposition"];
+            if (!string.IsNullOrEmpty(contentDisp))
+                RenameDownload(contentDisp);
+
             progressDownload.Visible = false;
             btnInstallAndReLaunch.Visible = true;            
 
@@ -85,7 +91,40 @@ namespace AppLimit.NetSparkle
             if (_unattend)
                 btnInstallAndReLaunch_Click(null, null);
         }
-               
+
+        private void RenameDownload(string contentDisp)
+        {
+            int index = contentDisp.IndexOf("filename=");
+            if (index == -1)
+                return;
+
+            string suspectedName = contentDisp.Substring(index + "filename=".Length);
+
+            if (string.IsNullOrEmpty(suspectedName))
+                return;
+
+            if (suspectedName[0] == '"')
+            {
+                RenameDownloadTo(suspectedName.Substring(1).Split('"').First());
+                return;
+            }
+
+            RenameDownloadTo(suspectedName.Split(';').First());
+        }
+
+        private void RenameDownloadTo(string newName)
+        {
+            string newPath = Path.Combine(Path.GetTempPath(), newName);
+            try
+            {
+                File.Move(_tempName, newPath);
+                _tempName = newPath;
+            }
+            catch (Exception)
+            {
+            }
+        }
+
         private void Client_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
             progressDownload.Value = e.ProgressPercentage;            
