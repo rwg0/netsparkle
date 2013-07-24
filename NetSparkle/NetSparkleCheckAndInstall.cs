@@ -6,6 +6,7 @@ using System.Text;
 using System.IO;
 using System.Diagnostics;
 using System.Reflection;
+using Shell32;
 
 namespace AppLimit.NetSparkle
 {
@@ -91,27 +92,19 @@ namespace AppLimit.NetSparkle
         private static List<string> UnpackZip(string tempName)
         {
             string path = Path.GetDirectoryName(tempName);
-            var package = ZipPackage.Open(tempName, FileMode.Open, FileAccess.Read);
+            Shell32.Shell shell = new Shell32.Shell();
+            var app = shell.Application;
+            var items = app.Namespace(tempName).Items;
+            var toAdd = items.Count;
 
-            List<string> unpackedFiles = new List<string>();
+            DirectoryInfo di = new DirectoryInfo(path);
+            int expected = di.GetFiles().Count() + toAdd;
 
-            foreach (var part in package.GetParts())
-            {
-                var subPath = part.Uri.OriginalString.Replace('/', Path.DirectorySeparatorChar).TrimStart(Path.DirectorySeparatorChar);
-                var target = Path.Combine(path, subPath);
-                if (!Directory.Exists(Path.GetDirectoryName(target)))
-                    Directory.CreateDirectory(Path.GetDirectoryName(target));
-                using (FileStream fs = File.Create(target))
-                {
-                    part.GetStream().CopyTo(fs);
-                }
+            app.Namespace(path).CopyHere(items, 4 + 20 + 512 + 1024);
 
-                unpackedFiles.Add(target);
-            }
+            System.Threading.SpinWait.SpinUntil(() => di.GetFiles().Count() == expected, 5000);
 
-            package.Close();
-
-            return unpackedFiles;
+            return di.GetFiles().Select(x => x.FullName).Where(x => x != tempName).ToList();
         }
 
         public static bool CheckDSA(Sparkle sparkle, NetSparkleAppCastItem item, String tempName)
