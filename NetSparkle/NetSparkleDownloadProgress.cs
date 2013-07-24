@@ -114,9 +114,14 @@ namespace AppLimit.NetSparkle
 
         private void RenameDownloadTo(string newName)
         {
-            string newPath = Path.Combine(Path.GetTempPath(), newName);
+            string guid = Guid.NewGuid().ToString();
+            string tempfolder = Path.Combine(Path.GetTempPath(), guid);
+            Directory.CreateDirectory(tempfolder);
+            string newPath = Path.Combine(tempfolder, newName);
             try
             {
+                if (File.Exists(newName))
+                    File.Delete(newName);
                 File.Move(_tempName, newPath);
                 _tempName = newPath;
             }

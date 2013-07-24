@@ -27,6 +27,10 @@ namespace AppLimit.NetSparkle
                 // build the command line 
                 installerCMD = tempName;
             }
+            else if (Path.GetExtension(tempName).ToLower() == ".zip")
+            {
+                installerCMD = tempName;
+            }
             else if (Path.GetExtension(tempName).ToLower().Equals(".msi"))
             {
                 // build the command line
