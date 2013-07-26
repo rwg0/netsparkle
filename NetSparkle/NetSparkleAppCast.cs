@@ -70,7 +70,7 @@ namespace AppLimit.NetSparkle
                         case descriptionNode:
                             {
                                 if (currentItem != null)
-                                    currentItem.Description = reader.ReadString();
+                                    currentItem.Description = reader.ReadInnerXml();
                                 break;
                             }
                     }
