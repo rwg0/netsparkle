@@ -27,10 +27,12 @@ namespace AppLimit.NetSparkle
             lblInfoText.Text = lblInfoText.Text.Replace("APP", item.AppName + " " + item.Version);
             lblInfoText.Text = lblInfoText.Text.Replace("OLDVERSION", item.AppVersionInstalled);
 
-            if (item.ReleaseNotesLink != null && item.ReleaseNotesLink.Length > 0 )
+            if (!string.IsNullOrEmpty(item.ReleaseNotesLink) )
                 NetSparkleBrowser.Navigate(item.ReleaseNotesLink);
-            else            
-                RemoveReleaseNotesControls();            
+            else if (string.IsNullOrEmpty(item.Description) == false)
+                NetSparkleBrowser.DocumentText = item.Description;
+            else
+                RemoveReleaseNotesControls();
 
             if (appIcon != null)
                 imgAppIcon.Image = appIcon;

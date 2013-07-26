@@ -19,6 +19,7 @@ namespace AppLimit.NetSparkle
         private const String versionAttribute = "sparkle:version";
         private const String dasSignature = "sparkle:dsaSignature";
         private const String urlAttribute = "url";
+        private const String descriptionNode = "description";
 
         public NetSparkleAppCast(String castUrl, NetSparkleConfiguration config)
         {
@@ -64,6 +65,12 @@ namespace AppLimit.NetSparkle
                                 currentItem.DownloadLink = reader.GetAttribute(urlAttribute);
                                 currentItem.DSASignature = reader.GetAttribute(dasSignature);
 
+                                break;
+                            }
+                        case descriptionNode:
+                            {
+                                if (currentItem != null)
+                                    currentItem.Description = reader.ReadString();
                                 break;
                             }
                     }

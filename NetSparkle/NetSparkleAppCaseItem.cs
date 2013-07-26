@@ -16,6 +16,8 @@ namespace AppLimit.NetSparkle
 
         public String DSASignature;
 
+        public string Description;
+
         #region IComparable<NetSparkleAppCastItem> Members
 
         public int CompareTo(NetSparkleAppCastItem other)
