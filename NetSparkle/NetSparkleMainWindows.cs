@@ -20,7 +20,38 @@ namespace AppLimit.NetSparkle
             InitializeComponent();
 
             // init logfile
-            sw = File.CreateText(Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "NetSparkle.log"));
+
+            InitializeLog();
+        }
+
+        private void InitializeLog()
+        {
+            sw = OpenLogFileWriter("");
+
+            int iNum = 0;
+            while (sw == null)
+            {
+                iNum++;
+                sw = OpenLogFileWriter(iNum.ToString());
+            }
+        }
+
+        private static StreamWriter OpenLogFileWriter(string sID)
+        {
+            try
+            {
+                return File.CreateText(CreateLogFilePath(sID));
+            }
+            catch (IOException ex)
+            {
+                return null;
+            }
+            
+        }
+
+        private static string CreateLogFilePath(string sID)
+        {
+            return Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), String.Format("NetSparkle{0}.log", sID));
         }
 
         public void Report(String message)
