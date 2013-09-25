@@ -78,6 +78,7 @@ namespace AppLimit.NetSparkle
                 if (e.Error != null)
                 {
                     MessageBox.Show(this, string.Format("Download of update from {0} failed.\r\n\r\nDetail : {1}", _item.DownloadLink, e.Error.Message), "NetSparkle", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Close();
                     return;
                 }
 
