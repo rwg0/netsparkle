@@ -21,6 +21,7 @@ namespace AppLimit.NetSparkle
         private String _referencedAssembly;
         private Sparkle _sparkle;
         private Boolean _unattend;
+        private WebClient _client;
 
         public NetSparkleDownloadProgress(Sparkle sparkle, NetSparkleAppCastItem item, String referencedAssembly, Image appIcon, Icon windowIcon, Boolean Unattend)
         {
@@ -57,40 +58,51 @@ namespace AppLimit.NetSparkle
             _tempName = Path.GetTempFileName();
 
             // start async download
-            WebClient Client = new WebClient();
-            Client.DownloadProgressChanged += new DownloadProgressChangedEventHandler(Client_DownloadProgressChanged);
-            Client.DownloadFileCompleted += new AsyncCompletedEventHandler(Client_DownloadFileCompleted);
+            _client = new WebClient();
+            _client.DownloadProgressChanged += new DownloadProgressChangedEventHandler(Client_DownloadProgressChanged);
+            _client.DownloadFileCompleted += new AsyncCompletedEventHandler(Client_DownloadFileCompleted);
             
             Uri url = new Uri(item.DownloadLink);
 
-            Client.DownloadFileAsync(url, _tempName);
+            _client.DownloadFileAsync(url, _tempName);
         }
 
         private void Client_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
         {
-            WebClient wc = (WebClient) sender;
-
-            var contentDisp = wc.ResponseHeaders["content-disposition"];
-            if (!string.IsNullOrEmpty(contentDisp))
-                RenameDownload(contentDisp);
-
-            progressDownload.Visible = false;
-            btnInstallAndReLaunch.Visible = true;            
-
-            // report message            
-            _sparkle.ReportDiagnosticMessage("Finished downloading file to: " + _tempName);
-
-            if (!NetSparkleCheckAndInstall.CheckDSA(_sparkle, _item, _tempName))
+            if (InvokeRequired)
             {
-                btnInstallAndReLaunch.Enabled = false;
-                Size = new Size(Size.Width, 137);
-                lblSecurityHint.Visible = true;
-                BackColor = Color.Tomato;
+                BeginInvoke(new EventHandler<AsyncCompletedEventArgs>(Client_DownloadFileCompleted), new object[] {sender, e});
             }
-               
-            // Check the unattended mode
-            if (_unattend)
-                btnInstallAndReLaunch_Click(null, null);
+            else
+            {
+                if (e.Error != null)
+                {
+                    MessageBox.Show(this, string.Format("Download of update from {0} failed.\r\n\r\nDetail : {1}", _item.DownloadLink, e.Error.Message), "NetSparkle", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                var contentDisp = _client.ResponseHeaders["content-disposition"];
+                if (!string.IsNullOrEmpty(contentDisp))
+                    RenameDownload(contentDisp);
+
+                progressDownload.Visible = false;
+                btnInstallAndReLaunch.Visible = true;
+
+                // report message            
+                _sparkle.ReportDiagnosticMessage("Finished downloading file to: " + _tempName);
+
+                if (!NetSparkleCheckAndInstall.CheckDSA(_sparkle, _item, _tempName))
+                {
+                    btnInstallAndReLaunch.Enabled = false;
+                    Size = new Size(Size.Width, 137);
+                    lblSecurityHint.Visible = true;
+                    BackColor = Color.Tomato;
+                }
+
+                // Check the unattended mode
+                if (_unattend)
+                    btnInstallAndReLaunch_Click(null, null);
+            }
         }
 
         private void RenameDownload(string contentDisp)
