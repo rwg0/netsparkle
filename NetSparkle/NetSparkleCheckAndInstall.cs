@@ -6,6 +6,7 @@ using System.Text;
 using System.IO;
 using System.Diagnostics;
 using System.Reflection;
+using Ionic.Zip;
 using Shell32;
 
 namespace AppLimit.NetSparkle
@@ -91,18 +92,10 @@ namespace AppLimit.NetSparkle
 
         private static List<string> UnpackZip(string tempName)
         {
+            var zf = new ZipFile(tempName);
             string path = Path.GetDirectoryName(tempName);
-            Shell32.Shell shell = new Shell32.Shell();
-            var app = shell.Application;
-            var items = app.Namespace(tempName).Items;
-            var toAdd = items.Count;
-
+            zf.ExtractAll(path);
             DirectoryInfo di = new DirectoryInfo(path);
-            int expected = di.GetFiles().Count() + toAdd;
-
-            app.Namespace(path).CopyHere(items, 4 + 20 + 512 + 1024);
-
-            System.Threading.SpinWait.SpinUntil(() => di.GetFiles().Count() == expected, 5000);
 
             return di.GetFiles().Select(x => x.FullName).Where(x => x != tempName).ToList();
         }
