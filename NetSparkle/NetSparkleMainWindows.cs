@@ -12,7 +12,7 @@ namespace AppLimit.NetSparkle
 {
     public partial class NetSparkleMainWindows : Form, IDisposable
     {
-        private StreamWriter sw = null;
+        private TextWriter _sw = null;
 
         public NetSparkleMainWindows()
         {
@@ -26,13 +26,20 @@ namespace AppLimit.NetSparkle
 
         private void InitializeLog()
         {
-            sw = OpenLogFileWriter("");
-
-            int iNum = 0;
-            while (sw == null)
+            try
             {
-                iNum++;
-                sw = OpenLogFileWriter(iNum.ToString());
+                _sw = OpenLogFileWriter("");
+
+                int iNum = 0;
+                while (_sw == null)
+                {
+                    iNum++;
+                    _sw = OpenLogFileWriter(iNum.ToString());
+                }
+            }
+            catch (UnauthorizedAccessException)
+            {
+                _sw = new StringWriter();
             }
         }
 
@@ -77,10 +84,10 @@ namespace AppLimit.NetSparkle
             try
             {
                 // write 
-                sw.WriteLine(msg);
+                _sw.WriteLine(msg);
 
                 // flush
-                sw.Flush();
+                _sw.Flush();
             } catch(Exception)
             {
 
@@ -92,10 +99,10 @@ namespace AppLimit.NetSparkle
         void IDisposable.Dispose()
         {
             // flush again
-            sw.Flush();
+            _sw.Flush();
 
             // close the stream
-            sw.Dispose();
+            _sw.Dispose();
 
             // close the base
             base.Dispose();
