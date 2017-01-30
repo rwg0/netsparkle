@@ -6,3 +6,4 @@ Release
 /*.suo
 
 /packages
+/.vs/NetSparkle2010/v14/*.suo

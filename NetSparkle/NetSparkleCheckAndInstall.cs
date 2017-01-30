@@ -36,6 +36,12 @@ namespace AppLimit.NetSparkle
                 Install(sparkle, unpacked);
                 return;
             }
+            else if (tempName.ToLower().EndsWith(".exe.zip"))
+            {
+                string unpacked = UnpackZip(tempName).First();
+                Install(sparkle, unpacked);
+                return;
+            }
             else if (Path.GetExtension(tempName).ToLower() == ".zip")
             {
                 installerCMD = tempName;
