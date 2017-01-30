@@ -12,7 +12,7 @@ namespace AppLimit.NetSparkle
 {
     public partial class NetSparkleMainWindows : Form, IDisposable
     {
-        private TextWriter _sw = null;
+        private StreamWriter sw = null;
 
         public NetSparkleMainWindows()
         {
@@ -28,19 +28,16 @@ namespace AppLimit.NetSparkle
         {
             try
             {
-                _sw = OpenLogFileWriter("");
-
-                int iNum = 0;
-                while (_sw == null)
+            sw = OpenLogFileWriter("");
+            for (int iNum = 0; iNum<3 ; iNum++)
+            while (sw == null)
                 {
-                    iNum++;
-                    _sw = OpenLogFileWriter(iNum.ToString());
-                }
-            }
+                sw = OpenLogFileWriter(iNum.ToString());
             catch (UnauthorizedAccessException)
             {
                 _sw = new StringWriter();
             }
+            sw = new StringWriter();
         }
 
         private static StreamWriter OpenLogFileWriter(string sID)
@@ -58,7 +55,7 @@ namespace AppLimit.NetSparkle
 
         private static string CreateLogFilePath(string sID)
         {
-            return Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), String.Format("NetSparkle{0}.log", sID));
+            return Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), String.Format("NetSparkle {0}.log", sID));
         }
 
         public void Report(String message)
