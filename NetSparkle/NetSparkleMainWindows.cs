@@ -12,7 +12,7 @@ namespace AppLimit.NetSparkle
 {
     public partial class NetSparkleMainWindows : Form, IDisposable
     {
-        private StreamWriter sw = null;
+        private TextWriter _sw = null;
 
         public NetSparkleMainWindows()
         {
@@ -26,18 +26,13 @@ namespace AppLimit.NetSparkle
 
         private void InitializeLog()
         {
-            try
-            {
-            sw = OpenLogFileWriter("");
             for (int iNum = 0; iNum<3 ; iNum++)
-            while (sw == null)
-                {
-                sw = OpenLogFileWriter(iNum.ToString());
-            catch (UnauthorizedAccessException)
             {
-                _sw = new StringWriter();
+                _sw = OpenLogFileWriter(DateTime.UtcNow.ToString("yy-MM-dd--hh-mm-ss"));
+                if (_sw != null)
+                    return;
             }
-            sw = new StringWriter();
+            _sw = new StringWriter();
         }
 
         private static StreamWriter OpenLogFileWriter(string sID)
