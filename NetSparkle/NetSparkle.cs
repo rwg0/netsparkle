@@ -139,6 +139,10 @@ namespace AppLimit.NetSparkle
         /// </summary>
         public String ServiceName { get; set; }
 
+        public string InstallCommandOptions { get; set; }
+
+        public bool RestartApplication { get; set; } = true;
+
         /// <summary>
         /// This property returns true when the upadete loop is running
         /// and files when the loop is not running
@@ -734,7 +738,7 @@ namespace AppLimit.NetSparkle
 
             if (NetSparkleCheckAndInstall.CheckDSA(this, item, _tempName))
             { 
-                NetSparkleCheckAndInstall.Install(this, _tempName);
+                NetSparkleCheckAndInstall.Install(this, _tempName, RestartApplication, InstallCommandOptions);
             }
         }
 

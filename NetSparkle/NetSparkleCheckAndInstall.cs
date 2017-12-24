@@ -14,7 +14,7 @@ namespace AppLimit.NetSparkle
     public static class NetSparkleCheckAndInstall
     {
 
-        public static void Install(Sparkle sparkle, String tempName)
+        public static void Install(Sparkle sparkle, String tempName, bool restartApp, string installCommandOptions)
         {
             // get the commandline 
             String cmdLine = Environment.CommandLine;
@@ -33,13 +33,13 @@ namespace AppLimit.NetSparkle
             else if (tempName.ToLower().EndsWith(".msi.zip"))
             {
                 string unpacked = UnpackZip(tempName).First();
-                Install(sparkle, unpacked);
+                Install(sparkle, unpacked, restartApp, installCommandOptions);
                 return;
             }
             else if (tempName.ToLower().EndsWith(".exe.zip"))
             {
                 string unpacked = UnpackZip(tempName).First();
-                Install(sparkle, unpacked);
+                Install(sparkle, unpacked, restartApp, installCommandOptions);
                 return;
             }
             else if (Path.GetExtension(tempName).ToLower() == ".zip")
@@ -64,6 +64,9 @@ namespace AppLimit.NetSparkle
                 return;
             }
 
+            if (!string.IsNullOrEmpty(installCommandOptions))
+                installerCMD += " " + installCommandOptions;
+
             // generate the batch file                
             sparkle.ReportDiagnosticMessage("Generating MSI batch in " + Path.GetFullPath(cmd));
 
@@ -77,7 +80,7 @@ namespace AppLimit.NetSparkle
 
             if (sparkle.EnableServiceMode)
                 write.WriteLine("net start \"" + sparkle.ServiceName + "\"");
-            else
+            else if (restartApp)
                 write.WriteLine(cmdLine);
 
             write.Close();
