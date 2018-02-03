@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -28,7 +29,7 @@ namespace AppLimit.NetSparkle
         {
             for (int iNum = 0; iNum<3 ; iNum++)
             {
-                _sw = OpenLogFileWriter(DateTime.UtcNow.ToString("yy-MM-dd--hh-mm-ss"));
+                _sw = OpenLogFileWriter(DateTime.UtcNow.ToString("yy-MM-dd--hh-mm-ss", CultureInfo.InvariantCulture));
                 if (_sw != null)
                     return;
             }
@@ -37,20 +38,25 @@ namespace AppLimit.NetSparkle
 
         private static StreamWriter OpenLogFileWriter(string sID)
         {
+            var logFilePath = CreateLogFilePath(sID);
             try
             {
-                return File.CreateText(CreateLogFilePath(sID));
+                return File.CreateText(logFilePath);
             }
             catch (IOException ex)
             {
                 return null;
+            }
+            catch (Exception e)
+            {
+                throw new InvalidOperationException($"Failed to create NetSparkle log file at {logFilePath}", e);
             }
             
         }
 
         private static string CreateLogFilePath(string sID)
         {
-            return Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), String.Format("NetSparkle {0}.log", sID));
+            return Path.Combine(Path.GetTempPath(), String.Format("NetSparkle {0}.log", sID));
         }
 
         public void Report(String message)
