@@ -13,7 +13,7 @@ using System.Diagnostics;
 using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
 using System.IO;
-
+using System.Security.Policy;
 
 
 namespace AppLimit.NetSparkle
@@ -84,6 +84,8 @@ namespace AppLimit.NetSparkle
         /// Contains the profile url for System profiling
         /// </summary>
         public Uri SystemProfileUrl;
+
+        public Func<Uri,Uri> DownloadUrlTransform { get; set; }
 
         /// <summary>
         /// This event will be raised when a check loop will be started
@@ -733,7 +735,7 @@ namespace AppLimit.NetSparkle
             // start async download
             WebClient Client = new WebClient();
             Uri url = new Uri(item.DownloadLink);
-
+            url = TransformSparkleUrl(url);
             Client.DownloadFile(url, _tempName);
 
             if (NetSparkleCheckAndInstall.CheckDSA(this, item, _tempName))
@@ -785,6 +787,14 @@ namespace AppLimit.NetSparkle
                 // check our cert                 
                 return (certificate is X509Certificate2) ? ((X509Certificate2)certificate).Verify() : false;
             }
+        }
+
+        public Uri TransformSparkleUrl(Uri url)
+        {
+            if (DownloadUrlTransform != null)
+                return DownloadUrlTransform(url);
+
+            return url;
         }
     }
 }

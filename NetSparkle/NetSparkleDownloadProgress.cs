@@ -63,6 +63,7 @@ namespace AppLimit.NetSparkle
             _client.DownloadFileCompleted += new AsyncCompletedEventHandler(Client_DownloadFileCompleted);
             
             Uri url = new Uri(item.DownloadLink);
+            url = sparkle.TransformSparkleUrl(url);
 
             _client.DownloadFileAsync(url, _tempName);
         }
