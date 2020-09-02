@@ -68,6 +68,8 @@ namespace AppLimit.NetSparkle
 
         private TimeSpan _CheckFrequency;
 
+        public Action ShutdownCallback = null;
+
         /// <summary>
         /// Enables system profiling against a profile server
         /// </summary>
@@ -740,7 +742,7 @@ namespace AppLimit.NetSparkle
 
             if (NetSparkleCheckAndInstall.CheckDSA(this, item, _tempName))
             { 
-                NetSparkleCheckAndInstall.Install(this, _tempName, RestartApplication, InstallCommandOptions);
+                NetSparkleCheckAndInstall.Install(this, _tempName, RestartApplication, InstallCommandOptions, ShutdownCallback);
             }
         }
 

@@ -14,7 +14,7 @@ namespace AppLimit.NetSparkle
     public static class NetSparkleCheckAndInstall
     {
 
-        public static void Install(Sparkle sparkle, String tempName, bool restartApp, string installCommandOptions)
+        public static void Install(Sparkle sparkle, String tempName, bool restartApp, string installCommandOptions, Action shutdownCallback)
         {
             // get the commandline 
             String cmdLine = Environment.CommandLine;
@@ -33,13 +33,13 @@ namespace AppLimit.NetSparkle
             else if (tempName.ToLower().EndsWith(".msi.zip"))
             {
                 string unpacked = UnpackZip(tempName).First();
-                Install(sparkle, unpacked, restartApp, installCommandOptions);
+                Install(sparkle, unpacked, restartApp, installCommandOptions, shutdownCallback);
                 return;
             }
             else if (tempName.ToLower().EndsWith(".exe.zip"))
             {
                 string unpacked = UnpackZip(tempName).First();
-                Install(sparkle, unpacked, restartApp, installCommandOptions);
+                Install(sparkle, unpacked, restartApp, installCommandOptions, shutdownCallback);
                 return;
             }
             else if (Path.GetExtension(tempName).ToLower() == ".zip")
@@ -94,9 +94,15 @@ namespace AppLimit.NetSparkle
             process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             process.Start();
 
-
-            // quit the app
-            Environment.Exit(0);
+            if (shutdownCallback != null)
+            {
+                shutdownCallback();
+            }
+            else
+            {
+                // quit the app
+                Environment.Exit(0);
+            }
         }
 
         private static List<string> UnpackZip(string tempName)
