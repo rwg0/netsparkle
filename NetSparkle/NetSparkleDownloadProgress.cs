@@ -22,6 +22,7 @@ namespace AppLimit.NetSparkle
         private Sparkle _sparkle;
         private Boolean _unattend;
         private WebClient _client;
+        private readonly int _height;
 
         public NetSparkleDownloadProgress(Sparkle sparkle, NetSparkleAppCastItem item, String referencedAssembly, Image appIcon, Icon windowIcon, Boolean Unattend)
         {
@@ -46,8 +47,9 @@ namespace AppLimit.NetSparkle
             progressDownload.Minimum = 0;
             progressDownload.Step = 1;
 
+            _height = Height;
             // show the right 
-            Size = new Size(Size.Width, 127);
+            Size = new Size(Size.Width, _height*127/159);
             lblSecurityHint.Visible = false;                
             
             // get the filename of the download lin
@@ -96,7 +98,7 @@ namespace AppLimit.NetSparkle
                 if (!NetSparkleCheckAndInstall.CheckDSA(_sparkle, _item, _tempName))
                 {
                     btnInstallAndReLaunch.Enabled = false;
-                    Size = new Size(Size.Width, 159);
+                    Size = new Size(Size.Width, _height);
                     lblSecurityHint.Visible = true;
                     BackColor = Color.Tomato;
                 }

@@ -465,7 +465,7 @@ namespace AppLimit.NetSparkle
         /// <param name="currentItem"></param>
         public void ShowUpdateNeededUI(NetSparkleAppCastItem currentItem)
         {
-            using (new DpiAwarenessContextChanger())
+           // using (new DpiAwarenessContextChanger())
             {
                 // create the form
                 NetSparkleForm frm = new NetSparkleForm(currentItem, ApplicationIcon, ApplicationWindowIcon);
@@ -721,7 +721,7 @@ namespace AppLimit.NetSparkle
             }
             else
             {
-                using (new DpiAwarenessContextChanger())
+                //using (new DpiAwarenessContextChanger())
                 {
                     NetSparkleDownloadProgress dlProgress =
                         new NetSparkleDownloadProgress(this, item, _AppReferenceAssembly, ApplicationIcon, ApplicationWindowIcon, EnableSilentMode);
