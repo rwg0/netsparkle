@@ -47,7 +47,7 @@ namespace AppLimit.NetSparkle
             progressDownload.Step = 1;
 
             // show the right 
-            Size = new Size(Size.Width, 107);
+            Size = new Size(Size.Width, 127);
             lblSecurityHint.Visible = false;                
             
             // get the filename of the download lin
@@ -96,7 +96,7 @@ namespace AppLimit.NetSparkle
                 if (!NetSparkleCheckAndInstall.CheckDSA(_sparkle, _item, _tempName))
                 {
                     btnInstallAndReLaunch.Enabled = false;
-                    Size = new Size(Size.Width, 137);
+                    Size = new Size(Size.Width, 159);
                     lblSecurityHint.Visible = true;
                     BackColor = Color.Tomato;
                 }
