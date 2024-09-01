@@ -465,28 +465,31 @@ namespace AppLimit.NetSparkle
         /// <param name="currentItem"></param>
         public void ShowUpdateNeededUI(NetSparkleAppCastItem currentItem)
         {
-            // create the form
-            NetSparkleForm frm = new NetSparkleForm(currentItem, ApplicationIcon, ApplicationWindowIcon);
-
-            // configure the form
-            frm.TopMost = true;
-
-            if (HideReleaseNotes)
-                frm.RemoveReleaseNotesControls();
-
-            // show it
-            DialogResult dlgResult = frm.ShowDialog();
-
-            if (dlgResult == DialogResult.No)
+            using (new DpiAwarenessContextChanger())
             {
-                // skip this version
-                NetSparkleConfiguration config = new NetSparkleConfiguration(_AppReferenceAssembly);
-                config.SetVersionToSkip(currentItem.Version);
-            }
-            else if (dlgResult == DialogResult.Yes)
-            {
-                // download the binaries
-                InitDownloadAndInstallProcess(currentItem);
+                // create the form
+                NetSparkleForm frm = new NetSparkleForm(currentItem, ApplicationIcon, ApplicationWindowIcon);
+
+                // configure the form
+                frm.TopMost = true;
+
+                if (HideReleaseNotes)
+                    frm.RemoveReleaseNotesControls();
+
+                // show it
+                DialogResult dlgResult = frm.ShowDialog();
+
+                if (dlgResult == DialogResult.No)
+                {
+                    // skip this version
+                    NetSparkleConfiguration config = new NetSparkleConfiguration(_AppReferenceAssembly);
+                    config.SetVersionToSkip(currentItem.Version);
+                }
+                else if (dlgResult == DialogResult.Yes)
+                {
+                    // download the binaries
+                    InitDownloadAndInstallProcess(currentItem);
+                }
             }
         }
 
@@ -718,11 +721,13 @@ namespace AppLimit.NetSparkle
             }
             else
             {
-                NetSparkleDownloadProgress dlProgress = new NetSparkleDownloadProgress(this, item, _AppReferenceAssembly, ApplicationIcon, ApplicationWindowIcon, EnableSilentMode);
-                dlProgress.ShowDialog();
+                using (new DpiAwarenessContextChanger())
+                {
+                    NetSparkleDownloadProgress dlProgress =
+                        new NetSparkleDownloadProgress(this, item, _AppReferenceAssembly, ApplicationIcon, ApplicationWindowIcon, EnableSilentMode);
+                    dlProgress.ShowDialog();
+                }
             }
-
-           
         }
 
         private void DownloadAndInstallSync(NetSparkleAppCastItem item)
