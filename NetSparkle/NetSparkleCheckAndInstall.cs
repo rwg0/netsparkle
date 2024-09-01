@@ -6,6 +6,7 @@ using System.Text;
 using System.IO;
 using System.Diagnostics;
 using System.Reflection;
+using System.Windows.Forms;
 using Ionic.Zip;
 using Shell32;
 
@@ -16,92 +17,102 @@ namespace AppLimit.NetSparkle
 
         public static void Install(Sparkle sparkle, String tempName, bool restartApp, string installCommandOptions, Action shutdownCallback)
         {
-            // get the commandline 
-            String cmdLine = Environment.CommandLine;
-            String workingDir = Environment.CurrentDirectory;
+            try
+            {
 
-            // generate the batch file path
-            String cmd = Environment.ExpandEnvironmentVariables("%temp%\\" + Guid.NewGuid() + ".cmd");
-            String installerCMD;
 
-            // get the file type
-            if (Path.GetExtension(tempName).ToLower().Equals(".exe"))
-            {
-                // build the command line 
-                installerCMD = tempName;
-            }
-            else if (tempName.ToLower().EndsWith(".msi.zip"))
-            {
-                string unpacked = UnpackZip(tempName).First();
-                Install(sparkle, unpacked, restartApp, installCommandOptions, shutdownCallback);
-                return;
-            }
-            else if (tempName.ToLower().EndsWith(".exe.zip"))
-            {
-                string unpacked = UnpackZip(tempName).First();
-                Install(sparkle, unpacked, restartApp, installCommandOptions, shutdownCallback);
-                return;
-            }
-            else if (Path.GetExtension(tempName).ToLower() == ".zip")
-            {
-                installerCMD = tempName;
-            }
-            else if (Path.GetExtension(tempName).ToLower().Equals(".msi"))
-            {
-                // build the command line
-                installerCMD = "msiexec /i \"" + tempName + "\"";
+                // get the commandline 
+                String cmdLine = Environment.CommandLine;
+                String workingDir = Environment.CurrentDirectory;
+
+                // generate the batch file path
+                String cmd = Environment.ExpandEnvironmentVariables("%temp%\\" + Guid.NewGuid() + ".cmd");
+                String installerCMD;
+
+                // get the file type
+                if (Path.GetExtension(tempName).ToLower().Equals(".exe"))
+                {
+                    // build the command line 
+                    installerCMD = tempName;
+                }
+                else if (tempName.ToLower().EndsWith(".msi.zip"))
+                {
+                    string unpacked = UnpackZip(tempName).First();
+                    Install(sparkle, unpacked, restartApp, installCommandOptions, shutdownCallback);
+                    return;
+                }
+                else if (tempName.ToLower().EndsWith(".exe.zip"))
+                {
+                    string unpacked = UnpackZip(tempName).First();
+                    Install(sparkle, unpacked, restartApp, installCommandOptions, shutdownCallback);
+                    return;
+                }
+                else if (Path.GetExtension(tempName).ToLower() == ".zip")
+                {
+                    installerCMD = tempName;
+                }
+                else if (Path.GetExtension(tempName).ToLower().Equals(".msi"))
+                {
+                    // build the command line
+                    installerCMD = "msiexec /i \"" + tempName + "\"";
+
+                    if (sparkle.EnableServiceMode)
+                    {
+                        installerCMD += " /qn";
+                    }
+                }
+                else
+                {
+                    sparkle.ReportDiagnosticMessage("Updater not supported, please execute " + tempName + " manually");
+                    //MessageBox.Show("Updater not supported, please execute " + tempName + " manually", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Environment.Exit(-1);
+                    return;
+                }
+
+                if (!string.IsNullOrEmpty(installCommandOptions))
+                    installerCMD += " " + installCommandOptions;
+
+                // generate the batch file                
+                sparkle.ReportDiagnosticMessage("Generating MSI batch in " + Path.GetFullPath(cmd));
+
+                StreamWriter write = new StreamWriter(cmd);
 
                 if (sparkle.EnableServiceMode)
+                    write.WriteLine("net stop \"" + sparkle.ServiceName + "\"");
+
+                write.WriteLine(installerCMD);
+                write.WriteLine("cd " + workingDir);
+
+                if (sparkle.EnableServiceMode)
+                    write.WriteLine("net start \"" + sparkle.ServiceName + "\"");
+                else if (restartApp)
+                    write.WriteLine(cmdLine);
+
+                write.Close();
+
+                // report
+                sparkle.ReportDiagnosticMessage("Going to execute batch: " + cmd);
+
+                // start the installer helper
+                Process process = new Process();
+                process.StartInfo.FileName = cmd;
+                process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                process.Start();
+
+                if (shutdownCallback != null)
                 {
-                    installerCMD += " /qn";
+                    shutdownCallback();
+                }
+                else
+                {
+                    // quit the app
+                    Environment.Exit(0);
                 }
             }
-            else
+            catch (Exception e)
             {
-                sparkle.ReportDiagnosticMessage("Updater not supported, please execute " + tempName + " manually");
-                //MessageBox.Show("Updater not supported, please execute " + tempName + " manually", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Environment.Exit(-1);
-                return;
-            }
-
-            if (!string.IsNullOrEmpty(installCommandOptions))
-                installerCMD += " " + installCommandOptions;
-
-            // generate the batch file                
-            sparkle.ReportDiagnosticMessage("Generating MSI batch in " + Path.GetFullPath(cmd));
-
-            StreamWriter write = new StreamWriter(cmd);
-
-            if (sparkle.EnableServiceMode)
-                write.WriteLine("net stop \"" + sparkle.ServiceName + "\"");
-
-            write.WriteLine(installerCMD);
-            write.WriteLine("cd " + workingDir);
-
-            if (sparkle.EnableServiceMode)
-                write.WriteLine("net start \"" + sparkle.ServiceName + "\"");
-            else if (restartApp)
-                write.WriteLine(cmdLine);
-
-            write.Close();
-
-            // report
-            sparkle.ReportDiagnosticMessage("Going to execute batch: " + cmd);
-
-            // start the installer helper
-            Process process = new Process();
-            process.StartInfo.FileName = cmd;
-            process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            process.Start();
-
-            if (shutdownCallback != null)
-            {
-                shutdownCallback();
-            }
-            else
-            {
-                // quit the app
-                Environment.Exit(0);
+                MessageBox.Show("Sorry, but the update could not be installed due to\r\n\r\n" + e.Message + "\r\n\r\nPlease try again, or update manually.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Trace.WriteLine(e);
             }
         }
 
