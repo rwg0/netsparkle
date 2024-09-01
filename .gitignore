@@ -3,4 +3,5 @@ Debug
 Release
 /*.suo
 /packages
-/.vs
+.vs
+
