@@ -7,9 +7,11 @@ namespace AppLimit.NetSparkle
     {
         INetSparkleAssemblyAccessor _internalAccessor = null;
 
-        public NetSparkleAssemblyAccessor(String assemblyName)
+        public NetSparkleAssemblyAccessor(String assemblyName, Boolean bUseReflectionAccesor)
         {
-
+            if ( bUseReflectionAccesor )
+                _internalAccessor = new NetSparkleAssemblyReflectionAccessor(assemblyName);
+            else
                 _internalAccessor = new NetSparkleAssemblyDiagnosticsAccessor(assemblyName);
         }
 

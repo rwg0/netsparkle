@@ -18,14 +18,16 @@ namespace AppLimit.NetSparkle
                 _assembly = Assembly.GetEntryAssembly();
             else
             {
-                String absolutePath = Path.GetFullPath(assemblyName);
-                if (!File.Exists(absolutePath))
-                    throw new FileNotFoundException();
+                throw new InvalidOperationException(
+                    "Reflection accessing no longer supported when providing a reference assembly. Assembly.ReflectionOnlyLoadFrom is no longer available");
+                //String absolutePath = Path.GetFullPath(assemblyName);
+                //if (!File.Exists(absolutePath))
+                //    throw new FileNotFoundException();
 
-                _assembly = Assembly.LoadFrom(absolutePath);
+                //_assembly = Assembly.ReflectionOnlyLoadFrom(absolutePath);
 
-                if (_assembly == null)
-                    throw new Exception("Unable to load assembly " + absolutePath);                
+                //if (_assembly == null)
+                //    throw new Exception("Unable to load assembly " + absolutePath);                
             }
 
             // read the attributes            
