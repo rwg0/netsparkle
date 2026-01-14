@@ -5,7 +5,6 @@ using System.IO;
 using System.Diagnostics;
 using System.Reflection;
 using System.Windows.Forms;
-using Ionic.Zip;
 #pragma warning disable CA1416
 
 namespace AppLimit.NetSparkle
@@ -32,18 +31,6 @@ namespace AppLimit.NetSparkle
                 {
                     // build the command line 
                     installerCMD = tempName;
-                }
-                else if (tempName.ToLower().EndsWith(".msi.zip"))
-                {
-                    string unpacked = UnpackZip(tempName).First();
-                    Install(sparkle, unpacked, restartApp, installCommandOptions, shutdownCallback);
-                    return;
-                }
-                else if (tempName.ToLower().EndsWith(".exe.zip"))
-                {
-                    string unpacked = UnpackZip(tempName).First();
-                    Install(sparkle, unpacked, restartApp, installCommandOptions, shutdownCallback);
-                    return;
                 }
                 else if (Path.GetExtension(tempName).ToLower() == ".zip")
                 {
@@ -114,15 +101,7 @@ namespace AppLimit.NetSparkle
             }
         }
 
-        private static List<string> UnpackZip(string tempName)
-        {
-            var zf = new ZipFile(tempName);
-            string path = Path.GetDirectoryName(tempName);
-            zf.ExtractAll(path);
-            DirectoryInfo di = new DirectoryInfo(path);
-
-            return di.GetFiles().Select(x => x.FullName).Where(x => x != tempName).ToList();
-        }
+       
 
         public static bool CheckDSA(Sparkle sparkle, NetSparkleAppCastItem item, String tempName)
         {
