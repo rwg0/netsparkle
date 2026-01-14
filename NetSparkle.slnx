@@ -1,0 +1,13 @@
+<Solution>
+  <Project Path="NetSparkle/NetSparkle2010.csproj" />
+  <Project Path="NetSparkleChecker/NetSparkleChecker2010.csproj" />
+  <Project Path="NetSparkleDSAHelper/NetSparkleDSAHelper.csproj">
+
+  </Project>
+  <Project Path="NetSparkleTestApp/NetSparkleTestApp.csproj">
+
+  </Project>
+  <Project Path="NetSparkleTestAppWPF/NetSparkleTestAppWPF.csproj">
+
+  </Project>
+</Solution>
