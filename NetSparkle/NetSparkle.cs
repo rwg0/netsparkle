@@ -1,19 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.ComponentModel;
 using System.Threading;
 using System.Net;
 using System.Windows.Forms;
 using System.Drawing;
 using System.Runtime.InteropServices;
-using System.Management;
-using System.Diagnostics;
 using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
-using System.IO;
-using System.Security.Policy;
+
+#pragma warning disable CA1416
 
 
 namespace AppLimit.NetSparkle

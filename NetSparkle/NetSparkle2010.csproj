@@ -36,5 +36,7 @@
     <PackageReference Include="DotNetZip.Reduced" Version="1.9.1.8" />
     <PackageReference Include="System.Management" Version="10.0.2" />
   </ItemGroup>
-  <PropertyGroup />
+  <PropertyGroup>
+    <EnableNETAnalyzers>False</EnableNETAnalyzers>
+  </PropertyGroup>
 </Project>

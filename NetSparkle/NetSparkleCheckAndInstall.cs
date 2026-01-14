@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO.Packaging;
 using System.Linq;
-using System.Text;
 using System.IO;
 using System.Diagnostics;
 using System.Reflection;
 using System.Windows.Forms;
 using Ionic.Zip;
-using Shell32;
+#pragma warning disable CA1416
 
 namespace AppLimit.NetSparkle
 {
