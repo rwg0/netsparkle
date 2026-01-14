@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using System.Management;
 using System.Threading;
 
 namespace AppLimit.NetSparkle
@@ -25,14 +24,10 @@ namespace AppLimit.NetSparkle
             // x64
             CollectProcessorBitnes();
 
-            // cpu speed
-            CollectCPUSpeed();
 
             // cpu count
             CollectCPUCount();
 
-            // ram size
-            CollectRamSize();
 
             // windows
             CollectWindowsVersion();
@@ -99,33 +94,6 @@ namespace AppLimit.NetSparkle
             CPUCount = Environment.ProcessorCount;
         }
 
-        private void CollectCPUSpeed()
-        {
-            ManagementObject Mo = new ManagementObject("Win32_Processor.DeviceID='CPU0'");
-            ProcessorSpeed = (uint)(Mo["CurrentClockSpeed"]);
-            Mo.Dispose();            
-        }
-
-        private void CollectRamSize()
-        {
-            MemorySize = 0;
-
-            // RAM size
-            ManagementScope oMs = new ManagementScope();
-            ObjectQuery oQuery = new ObjectQuery("SELECT Capacity FROM Win32_PhysicalMemory");
-            ManagementObjectSearcher oSearcher = new ManagementObjectSearcher(oMs, oQuery);
-            ManagementObjectCollection oCollection = oSearcher.Get();
-            
-            Int64 mCap = 0;
-
-            // In case more than one Memory sticks are installed
-            foreach (ManagementObject mobj in oCollection)
-            {
-                mCap = Convert.ToInt64(mobj["Capacity"]);
-                MemorySize += mCap;
-            }
-
-            MemorySize = (MemorySize / 1024) / 1024;
-        }
+      
     }
 }

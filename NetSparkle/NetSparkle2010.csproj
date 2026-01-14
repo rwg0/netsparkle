@@ -32,9 +32,6 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="System.Management" Version="10.0.2" />
-  </ItemGroup>
   <PropertyGroup>
     <EnableNETAnalyzers>False</EnableNETAnalyzers>
   </PropertyGroup>
