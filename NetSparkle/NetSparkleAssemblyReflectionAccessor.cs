@@ -22,7 +22,7 @@ namespace AppLimit.NetSparkle
                 if (!File.Exists(absolutePath))
                     throw new FileNotFoundException();
 
-                _assembly = Assembly.ReflectionOnlyLoadFrom(absolutePath);
+                _assembly = Assembly.LoadFrom(absolutePath);
 
                 if (_assembly == null)
                     throw new Exception("Unable to load assembly " + absolutePath);                

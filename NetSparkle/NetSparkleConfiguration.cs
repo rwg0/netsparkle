@@ -33,7 +33,7 @@ namespace AppLimit.NetSparkle
         /// to determine the assmebly name and verison, otherwise a System.Diagnostics
         /// based access will be used
         /// </summary>
-        public Boolean UseReflectionBasedAssemblyAccessor { get; private set; }
+        public Boolean UseReflectionBasedAssemblyAccessor => false;
 
         private String _referenceAssembly;
 
@@ -41,13 +41,8 @@ namespace AppLimit.NetSparkle
         /// The constructor reads out all configured values
         /// </summary>        
         public NetSparkleConfiguration(String ReferenceAssembly)
-            : this(ReferenceAssembly, true)
-        { }
-
-        public NetSparkleConfiguration(String ReferenceAssembly, Boolean UseReflectionBasedAssemblyAccessor)
         {
             // set the value
-            this.UseReflectionBasedAssemblyAccessor = UseReflectionBasedAssemblyAccessor;
 
             // save the referecne assembly
             _referenceAssembly = ReferenceAssembly;
@@ -58,7 +53,7 @@ namespace AppLimit.NetSparkle
                 InitWithDefaultValues();
 
                 // set some value from the binary
-                NetSparkleAssemblyAccessor accessor = new NetSparkleAssemblyAccessor(ReferenceAssembly, this.UseReflectionBasedAssemblyAccessor);
+                NetSparkleAssemblyAccessor accessor = new NetSparkleAssemblyAccessor(ReferenceAssembly);
                 ApplicationName     = accessor.AssemblyProduct;
                 InstalledVersion    = accessor.AssemblyVersion;
 
@@ -131,7 +126,7 @@ namespace AppLimit.NetSparkle
         /// <returns></returns>
         private String BuildRegistryPath()
         {
-            NetSparkleAssemblyAccessor accessor = new NetSparkleAssemblyAccessor(_referenceAssembly, UseReflectionBasedAssemblyAccessor);
+            NetSparkleAssemblyAccessor accessor = new NetSparkleAssemblyAccessor(_referenceAssembly);
 
             if (accessor.AssemblyCompany == null || accessor.AssemblyCompany.Length == 0 ||
                     accessor.AssemblyProduct == null || accessor.AssemblyProduct.Length == 0)
@@ -149,7 +144,6 @@ namespace AppLimit.NetSparkle
             LastCheckTime = new DateTime(0);
             SkipThisVersion = String.Empty;
             DidRunOnce = false;
-            UseReflectionBasedAssemblyAccessor = true;
         }
 
         /// <summary>
