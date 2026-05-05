@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Net;
 using System.IO;
+using System.Threading.Tasks;
 
 #pragma warning disable CA1416
 
@@ -150,7 +151,11 @@ namespace AppLimit.NetSparkle
 
         private void btnInstallAndReLaunch_Click(object sender, EventArgs e)
         {
-            NetSparkleCheckAndInstall.Install(_sparkle, _tempName, _sparkle.RestartApplication, _sparkle.InstallCommandOptions, _sparkle.ShutdownCallback);
+            Task.Run(() =>
+            {
+                NetSparkleCheckAndInstall.Install(_sparkle, _tempName, _sparkle.RestartApplication, _sparkle.InstallCommandOptions, _sparkle.ShutdownCallback);
+            });
+            Close();
         }
     }
 }
