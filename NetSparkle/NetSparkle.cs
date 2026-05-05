@@ -46,6 +46,8 @@ namespace AppLimit.NetSparkle
     /// <param name="e"></param>
     public delegate void UpdateDetected(Object sender, UpdateDetectedEventArgs e);
 
+    public delegate void UpdateInteractionComplete(object sender, EventArgs args);
+
     public class Sparkle : IDisposable
     {
         private BackgroundWorker _worker = new BackgroundWorker();
@@ -99,6 +101,8 @@ namespace AppLimit.NetSparkle
         /// process when an update is detected
         /// </summary>
         public event UpdateDetected updateDetected;
+
+        public event UpdateInteractionComplete updateUIDone;
 
         /// <summary>
         /// This property holds an optional application icon
@@ -696,6 +700,8 @@ namespace AppLimit.NetSparkle
                             InitDownloadAndInstallProcess(currentItem);
                         else
                             ShowUpdateNeededUI(currentItem);
+
+                        updateUIDone?.Invoke(this, EventArgs.Empty);
 
                         break;
                     }

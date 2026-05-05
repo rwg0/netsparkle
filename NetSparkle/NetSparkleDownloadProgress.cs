@@ -151,10 +151,7 @@ namespace AppLimit.NetSparkle
 
         private void btnInstallAndReLaunch_Click(object sender, EventArgs e)
         {
-            Task.Run(() =>
-            {
-                NetSparkleCheckAndInstall.Install(_sparkle, _tempName, _sparkle.RestartApplication, _sparkle.InstallCommandOptions, _sparkle.ShutdownCallback);
-            });
+            NetSparkleCheckAndInstall.Install(_sparkle, _tempName, _sparkle.RestartApplication, _sparkle.InstallCommandOptions, _sparkle.ShutdownCallback);
             Close();
         }
     }
